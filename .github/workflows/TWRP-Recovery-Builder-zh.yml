@@ -53,7 +53,7 @@ on:
         type: string
 
       lunch_target:
-        description: 'lunch 目标'
+        description: 'lunch 目标（14/14.1 起必须写三段式 <product>-<release>-<variant>，release 段一般填 trunk_staging；若报未知 release，看下面“打印可用 release 列表”步骤的日志）'
         required: true
         default: 'twrp_ums9621_1h10-eng'
         type: string
@@ -168,6 +168,35 @@ jobs:
           cd twrp
           repo sync --force-sync --no-tags --no-clone-bundle -j$(nproc)
 
+      - name: 打印可用 release 列表（仅 Android 14/14.1 分支需要参考）
+        run: |
+          MAP="twrp/build/release/release_config_map.textproto"
+          if [ -f "$MAP" ]; then
+            echo "📋 本分支合法的 release 名称（用于 lunch 三段式的中间段）："
+            grep -oP '(?<=name: ")[^"]+' "$MAP" || cat "$MAP"
+          else
+            echo "ℹ️ 未找到 release_config_map.textproto，说明这个 manifest 分支还是旧的两段式 lunch（12.1 及更早），可以忽略本步骤"
+          fi
+
+      - name: 校正 lunch 目标（Android 14/14.1 自动补齐 release 段）
+        id: lunch_fix
+        run: |
+          RAW="${{ github.event.inputs.lunch_target }}"
+          BRANCH="${{ steps.manifest_branch.outputs.branch }}"
+          DASH_COUNT=$(grep -o '-' <<< "$RAW" | wc -l)
+
+          if [[ "$BRANCH" == "twrp-14.1" || "$BRANCH" == "twrp-14" ]] && [ "$DASH_COUNT" -eq 1 ]; then
+            PRODUCT="${RAW%-*}"
+            VARIANT="${RAW##*-}"
+            FIXED="${PRODUCT}-trunk_staging-${VARIANT}"
+            echo "⚠️ 检测到 $BRANCH 需要三段式 lunch，已自动把 '$RAW' 转换为 '$FIXED'"
+            echo "   如果编译报 release 名未知，请参照上一步打印的列表，把 trunk_staging 换成里面列出的名字"
+            echo "target=$FIXED" >> $GITHUB_OUTPUT
+          else
+            echo "✅ 使用原始 lunch 目标：$RAW"
+            echo "target=$RAW" >> $GITHUB_OUTPUT
+          fi
+
       # ========== 可选：应用展讯DRM补丁 ==========
       - name: 应用展讯DRM显示修复补丁
         if: github.event.inputs.apply_sprd_drm_patch == 'true'
@@ -195,7 +224,7 @@ jobs:
         run: |
           cd twrp
           source build/envsetup.sh
-          lunch ${{ github.event.inputs.lunch_target }}
+          lunch ${{ steps.lunch_fix.outputs.target }}
           make clean
           export USE_CCACHE=0
           mka recoveryimage ALLOW_MISSING_DEPENDENCIES=true
@@ -206,7 +235,7 @@ jobs:
         run: |
           cd twrp
           source build/envsetup.sh
-          lunch ${{ github.event.inputs.lunch_target }}
+          lunch ${{ steps.lunch_fix.outputs.target }}
           export USE_CCACHE=0
           mka vendorbootimage
     #      mka vendorbootimage ALLOW_MISSING_DEPENDENCIES=true
@@ -217,7 +246,7 @@ jobs:
         run: |
           cd twrp
           source build/envsetup.sh
-          lunch ${{ github.event.inputs.lunch_target }}
+          lunch ${{ steps.lunch_fix.outputs.target }}
           export USE_CCACHE=0
           mka bootimage ALLOW_MISSING_DEPENDENCIES=true
 
