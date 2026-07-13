@@ -208,7 +208,7 @@ jobs:
           source build/envsetup.sh
           lunch ${{ github.event.inputs.lunch_target }}
           export USE_CCACHE=0
-          mka vendorbootimage ALLOW_MISSING_DEPENDENCIES=true
+    #      mka vendorbootimage ALLOW_MISSING_DEPENDENCIES=true
 
       # 编译 boot
       - name: 编译 boot 镜像
