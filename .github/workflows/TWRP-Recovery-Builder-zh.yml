@@ -39,7 +39,7 @@ on:
       device_tree_repo_url:
         description: '设备树 GitHub 仓库地址'
         required: true
-        default: 'https://github.com/TanukiSan566/Test-true-android_device_Rongyue-E5-twrp'
+        default: 'https://github.com/TanukiSan566/ums91581h10-HV-Rongyue-e5'
         type: string
       device_tree_branch:
         description: '设备树分支'
@@ -49,13 +49,13 @@ on:
       device_tree_path:
         description: '设备树在源码中的存放路径'
         required: true
-        default: 'device/unisoc/ums9621_1h10'
+        default: 'device/fortuneship/ums91581h10'
         type: string
 
       lunch_target:
         description: 'lunch 目标（14/14.1 起必须写三段式 <product>-<release>-<variant>，release 段一般填 trunk_staging；若报未知 release，看下面“打印可用 release 列表”步骤的日志）'
         required: true
-        default: 'twrp_ums9621_1h10-eng'
+        default: 'twrp_ums91581h10-eng'
         type: string
 
       build_target:
