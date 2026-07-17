@@ -12,6 +12,7 @@ on:
           - https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git
           - https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni.git
           - https://github.com/SHRP/manifest.git
+          - https://github.com/PitchBlackRecoveryProject/manifest_pb.git
 
       manifest_branch_preset:
         description: '选择常用的 manifest 分支（若选“自定义”，请在下方输入）'
