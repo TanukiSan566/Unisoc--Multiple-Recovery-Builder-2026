@@ -14,12 +14,13 @@ on:
       manifest_branch_preset:
         description: '选择常用的 manifest 分支（若选“自定义”，请在下方输入）'
         required: true
-        default: 'twrp-12.1'
+        default: 'android-12.1'
         type: choice
         options:
           - twrp-14.1
           - twrp-14
           - twrp-12.1
+          - android-12.1
           - twrp-11
           - twrp-10.0-deprecated
           - twrp-9.0
@@ -38,7 +39,7 @@ on:
       device_tree_repo_url:
         description: '设备树 GitHub 仓库地址。⚠️ 我这边改的设备树文件都是在本地/沙盒里改的，这个 workflow 是从这个 GitHub 仓库地址 + 下面的分支拉代码，不会自动用到本地改动——记得先把改好的文件 push 到这个仓库对应分支，再跑 workflow，否则 lunch/编译还是会用旧内容'
         required: true
-        default: 'https://github.com/TanukiSan566/ums91581h10-HV-Rongyue-e5'
+        default: 'https://github.com/TanukiSan566/device_fortuneship_ums91581h10-pbrp'
         type: string
       device_tree_branch:
         description: '设备树分支'
